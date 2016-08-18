@@ -13,10 +13,10 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>08/01/2016 14:18:41</publishTime>
     </File>
     <File Include="bin/App_global.asax.compiled">
-      <publishTime>08/17/2016 21:40:00</publishTime>
+      <publishTime>08/17/2016 22:22:02</publishTime>
     </File>
     <File Include="bin/App_global.asax.dll">
-      <publishTime>08/17/2016 21:40:00</publishTime>
+      <publishTime>08/17/2016 22:22:02</publishTime>
     </File>
     <File Include="bin/EntityFramework.dll">
       <publishTime>08/01/2016 14:19:56</publishTime>
@@ -751,7 +751,7 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>08/02/2016 20:17:11</publishTime>
     </File>
     <File Include="PrecompiledApp.config">
-      <publishTime>08/17/2016 21:39:54</publishTime>
+      <publishTime>08/17/2016 22:21:58</publishTime>
     </File>
     <File Include="Scripts/arrayToTable.js">
       <publishTime>08/14/2016 15:34:36</publishTime>
@@ -1114,10 +1114,10 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>08/01/2016 14:18:18</publishTime>
     </File>
     <File Include="Views/Contabilidad/CatalogoDeCuentas.cshtml">
-      <publishTime>08/16/2016 22:03:59</publishTime>
+      <publishTime>08/17/2016 22:17:00</publishTime>
     </File>
     <File Include="Views/Contabilidad/ComprobantesDeDiario.cshtml">
-      <publishTime>08/16/2016 23:00:02</publishTime>
+      <publishTime>08/17/2016 22:18:18</publishTime>
     </File>
     <File Include="Views/Contabilidad/SubCuentas.cshtml">
       <publishTime>08/16/2016 22:10:11</publishTime>
@@ -1138,7 +1138,7 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>08/01/2016 14:18:18</publishTime>
     </File>
     <File Include="Views/Shared/_LayoutErp.cshtml">
-      <publishTime>08/16/2016 23:00:35</publishTime>
+      <publishTime>08/17/2016 22:14:48</publishTime>
     </File>
     <File Include="Views/Shared/_LoginPartial.cshtml">
       <publishTime>08/01/2016 14:18:18</publishTime>
@@ -1150,7 +1150,7 @@ editando este archivo MSBuild. Para conocer más acerca de esto, visite http://g
       <publishTime>08/01/2016 14:18:18</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>08/17/2016 21:39:51</publishTime>
+      <publishTime>08/17/2016 22:20:12</publishTime>
     </File>
   </ItemGroup>
 </Project>
