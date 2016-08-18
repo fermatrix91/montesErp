@@ -1,0 +1,440 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="MontesERPModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ComprobanteDeDiario">
+          <Key>
+            <PropertyRef Name="IdComprobanteDeDiario" />
+          </Key>
+          <Property Name="IdComprobanteDeDiario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NumeroFolio" Type="int" Nullable="false" />
+          <Property Name="Concepto" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="FechaInicial" Type="datetime" Nullable="false" />
+          <Property Name="FechaCierre" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Cuenta">
+          <Key>
+            <PropertyRef Name="IdCuenta" />
+          </Key>
+          <Property Name="IdCuenta" Type="int" Nullable="false" />
+          <Property Name="IdSubGrupoCuenta" Type="int" Nullable="false" />
+          <Property Name="NombreCuenta" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="debeAnterior" Type="decimal" Precision="19" Scale="4" />
+          <Property Name="haberAnterior" Type="decimal" Precision="19" Scale="4" />
+          <Property Name="debeActual" Type="decimal" Precision="19" Scale="4" />
+          <Property Name="haberActual" Type="decimal" Precision="19" Scale="4" />
+        </EntityType>
+        <EntityType Name="DetalleComprobanteDeDiario">
+          <Key>
+            <PropertyRef Name="IdDetalleComprobanteDeDiario" />
+          </Key>
+          <Property Name="IdDetalleComprobanteDeDiario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdComprobanteDeDiario" Type="int" Nullable="false" />
+          <Property Name="IdSubCuenta" Type="int" Nullable="false" />
+          <Property Name="Debe" Type="decimal" Precision="19" Scale="4" />
+          <Property Name="Haber" Type="decimal" Precision="19" Scale="4" />
+        </EntityType>
+        <EntityType Name="GrupoCuenta">
+          <Key>
+            <PropertyRef Name="IdGrupoCuenta" />
+          </Key>
+          <Property Name="IdGrupoCuenta" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NombreGrupoCuenta" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="Producto">
+          <Key>
+            <PropertyRef Name="IdProducto" />
+          </Key>
+          <Property Name="IdProducto" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NombreProducto" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="PrecioProducto" Type="money" Nullable="false" />
+        </EntityType>
+        <EntityType Name="SubCuenta">
+          <Key>
+            <PropertyRef Name="IdSubCuenta" />
+          </Key>
+          <Property Name="IdSubCuenta" Type="int" Nullable="false" />
+          <Property Name="IdCuenta" Type="int" Nullable="false" />
+          <Property Name="NombreSubCuenta" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="debeAnterior" Type="decimal" Precision="19" Scale="4" />
+          <Property Name="haberAnterior" Type="decimal" Precision="19" Scale="4" />
+          <Property Name="debeActual" Type="decimal" Precision="19" Scale="4" />
+          <Property Name="haberActual" Type="decimal" Precision="19" Scale="4" />
+          <Property Name="saldo" Type="decimal" Precision="19" Scale="4" />
+        </EntityType>
+        <EntityType Name="SubGrupoCuenta">
+          <Key>
+            <PropertyRef Name="IdSubGrupoCuenta" />
+          </Key>
+          <Property Name="IdSubGrupoCuenta" Type="int" Nullable="false" />
+          <Property Name="IdGrupoCuenta" Type="int" Nullable="false" />
+          <Property Name="NombreSubGrupoCuenta" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Cuenta_SubGrupoCuenta">
+          <End Role="SubGrupoCuenta" Type="Self.SubGrupoCuenta" Multiplicity="1" />
+          <End Role="Cuenta" Type="Self.Cuenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SubGrupoCuenta">
+              <PropertyRef Name="IdSubGrupoCuenta" />
+            </Principal>
+            <Dependent Role="Cuenta">
+              <PropertyRef Name="IdSubGrupoCuenta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetalleComprobanteDeDiario_ComprobanteDeDiario1">
+          <End Role="ComprobanteDeDiario" Type="Self.ComprobanteDeDiario" Multiplicity="1" />
+          <End Role="DetalleComprobanteDeDiario" Type="Self.DetalleComprobanteDeDiario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ComprobanteDeDiario">
+              <PropertyRef Name="IdComprobanteDeDiario" />
+            </Principal>
+            <Dependent Role="DetalleComprobanteDeDiario">
+              <PropertyRef Name="IdComprobanteDeDiario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetalleComprobanteDeDiario_SubCuenta">
+          <End Role="SubCuenta" Type="Self.SubCuenta" Multiplicity="1" />
+          <End Role="DetalleComprobanteDeDiario" Type="Self.DetalleComprobanteDeDiario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SubCuenta">
+              <PropertyRef Name="IdSubCuenta" />
+            </Principal>
+            <Dependent Role="DetalleComprobanteDeDiario">
+              <PropertyRef Name="IdSubCuenta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SubCuenta_Cuenta">
+          <End Role="Cuenta" Type="Self.Cuenta" Multiplicity="1" />
+          <End Role="SubCuenta" Type="Self.SubCuenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cuenta">
+              <PropertyRef Name="IdCuenta" />
+            </Principal>
+            <Dependent Role="SubCuenta">
+              <PropertyRef Name="IdCuenta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SubGrupoCuenta_GrupoCuenta">
+          <End Role="GrupoCuenta" Type="Self.GrupoCuenta" Multiplicity="1" />
+          <End Role="SubGrupoCuenta" Type="Self.SubGrupoCuenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="GrupoCuenta">
+              <PropertyRef Name="IdGrupoCuenta" />
+            </Principal>
+            <Dependent Role="SubGrupoCuenta">
+              <PropertyRef Name="IdGrupoCuenta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="MontesERPModelStoreContainer">
+          <EntitySet Name="ComprobanteDeDiario" EntityType="Self.ComprobanteDeDiario" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Cuenta" EntityType="Self.Cuenta" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DetalleComprobanteDeDiario" EntityType="Self.DetalleComprobanteDeDiario" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GrupoCuenta" EntityType="Self.GrupoCuenta" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Producto" EntityType="Self.Producto" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SubCuenta" EntityType="Self.SubCuenta" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SubGrupoCuenta" EntityType="Self.SubGrupoCuenta" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Cuenta_SubGrupoCuenta" Association="Self.FK_Cuenta_SubGrupoCuenta">
+            <End Role="SubGrupoCuenta" EntitySet="SubGrupoCuenta" />
+            <End Role="Cuenta" EntitySet="Cuenta" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetalleComprobanteDeDiario_ComprobanteDeDiario1" Association="Self.FK_DetalleComprobanteDeDiario_ComprobanteDeDiario1">
+            <End Role="ComprobanteDeDiario" EntitySet="ComprobanteDeDiario" />
+            <End Role="DetalleComprobanteDeDiario" EntitySet="DetalleComprobanteDeDiario" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetalleComprobanteDeDiario_SubCuenta" Association="Self.FK_DetalleComprobanteDeDiario_SubCuenta">
+            <End Role="SubCuenta" EntitySet="SubCuenta" />
+            <End Role="DetalleComprobanteDeDiario" EntitySet="DetalleComprobanteDeDiario" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SubCuenta_Cuenta" Association="Self.FK_SubCuenta_Cuenta">
+            <End Role="Cuenta" EntitySet="Cuenta" />
+            <End Role="SubCuenta" EntitySet="SubCuenta" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SubGrupoCuenta_GrupoCuenta" Association="Self.FK_SubGrupoCuenta_GrupoCuenta">
+            <End Role="GrupoCuenta" EntitySet="GrupoCuenta" />
+            <End Role="SubGrupoCuenta" EntitySet="SubGrupoCuenta" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="MontesERPModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Producto">
+          <Key>
+            <PropertyRef Name="IdProducto" />
+          </Key>
+          <Property Name="IdProducto" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NombreProducto" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PrecioProducto" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="MontesERPEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Productoes" EntityType="Self.Producto" />
+          <EntitySet Name="ComprobanteDeDiarios" EntityType="MontesERPModel.ComprobanteDeDiario" />
+          <EntitySet Name="Cuentas" EntityType="MontesERPModel.Cuenta" />
+          <EntitySet Name="DetalleComprobanteDeDiarios" EntityType="MontesERPModel.DetalleComprobanteDeDiario" />
+          <EntitySet Name="GrupoCuentas" EntityType="MontesERPModel.GrupoCuenta" />
+          <EntitySet Name="SubCuentas" EntityType="MontesERPModel.SubCuenta" />
+          <EntitySet Name="SubGrupoCuentas" EntityType="MontesERPModel.SubGrupoCuenta" />
+          <AssociationSet Name="FK_DetalleComprobanteDeDiario_ComprobanteDeDiario1" Association="MontesERPModel.FK_DetalleComprobanteDeDiario_ComprobanteDeDiario1">
+            <End Role="ComprobanteDeDiario" EntitySet="ComprobanteDeDiarios" />
+            <End Role="DetalleComprobanteDeDiario" EntitySet="DetalleComprobanteDeDiarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Cuenta_SubGrupoCuenta" Association="MontesERPModel.FK_Cuenta_SubGrupoCuenta">
+            <End Role="SubGrupoCuenta" EntitySet="SubGrupoCuentas" />
+            <End Role="Cuenta" EntitySet="Cuentas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SubCuenta_Cuenta" Association="MontesERPModel.FK_SubCuenta_Cuenta">
+            <End Role="Cuenta" EntitySet="Cuentas" />
+            <End Role="SubCuenta" EntitySet="SubCuentas" />
+          </AssociationSet>
+          <AssociationSet Name="FK_DetalleComprobanteDeDiario_SubCuenta" Association="MontesERPModel.FK_DetalleComprobanteDeDiario_SubCuenta">
+            <End Role="SubCuenta" EntitySet="SubCuentas" />
+            <End Role="DetalleComprobanteDeDiario" EntitySet="DetalleComprobanteDeDiarios" />
+          </AssociationSet>
+          <AssociationSet Name="FK_SubGrupoCuenta_GrupoCuenta" Association="MontesERPModel.FK_SubGrupoCuenta_GrupoCuenta">
+            <End Role="GrupoCuenta" EntitySet="GrupoCuentas" />
+            <End Role="SubGrupoCuenta" EntitySet="SubGrupoCuentas" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="ComprobanteDeDiario">
+          <Key>
+            <PropertyRef Name="IdComprobanteDeDiario" />
+          </Key>
+          <Property Name="IdComprobanteDeDiario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Concepto" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="FechaInicial" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="FechaCierre" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="DetalleComprobanteDeDiarios" Relationship="MontesERPModel.FK_DetalleComprobanteDeDiario_ComprobanteDeDiario1" FromRole="ComprobanteDeDiario" ToRole="DetalleComprobanteDeDiario" />
+          <Property Name="NumeroFolio" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Cuenta">
+          <Key>
+            <PropertyRef Name="IdCuenta" />
+          </Key>
+          <Property Name="IdCuenta" Type="Int32" Nullable="false" />
+          <Property Name="IdSubGrupoCuenta" Type="Int32" Nullable="false" />
+          <Property Name="NombreCuenta" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="debeAnterior" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="haberAnterior" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="debeActual" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="haberActual" Type="Decimal" Precision="19" Scale="4" />
+          <NavigationProperty Name="SubGrupoCuenta" Relationship="MontesERPModel.FK_Cuenta_SubGrupoCuenta" FromRole="Cuenta" ToRole="SubGrupoCuenta" />
+          <NavigationProperty Name="SubCuentas" Relationship="MontesERPModel.FK_SubCuenta_Cuenta" FromRole="Cuenta" ToRole="SubCuenta" />
+        </EntityType>
+        <EntityType Name="DetalleComprobanteDeDiario">
+          <Key>
+            <PropertyRef Name="IdDetalleComprobanteDeDiario" />
+          </Key>
+          <Property Name="IdDetalleComprobanteDeDiario" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdComprobanteDeDiario" Type="Int32" Nullable="false" />
+          <Property Name="IdSubCuenta" Type="Int32" Nullable="false" />
+          <Property Name="Debe" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="Haber" Type="Decimal" Precision="19" Scale="4" />
+          <NavigationProperty Name="ComprobanteDeDiario" Relationship="MontesERPModel.FK_DetalleComprobanteDeDiario_ComprobanteDeDiario1" FromRole="DetalleComprobanteDeDiario" ToRole="ComprobanteDeDiario" />
+          <NavigationProperty Name="SubCuenta" Relationship="MontesERPModel.FK_DetalleComprobanteDeDiario_SubCuenta" FromRole="DetalleComprobanteDeDiario" ToRole="SubCuenta" />
+        </EntityType>
+        <EntityType Name="GrupoCuenta">
+          <Key>
+            <PropertyRef Name="IdGrupoCuenta" />
+          </Key>
+          <Property Name="IdGrupoCuenta" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NombreGrupoCuenta" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="SubGrupoCuentas" Relationship="MontesERPModel.FK_SubGrupoCuenta_GrupoCuenta" FromRole="GrupoCuenta" ToRole="SubGrupoCuenta" />
+        </EntityType>
+        <EntityType Name="SubCuenta">
+          <Key>
+            <PropertyRef Name="IdSubCuenta" />
+          </Key>
+          <Property Name="IdSubCuenta" Type="Int32" Nullable="false" />
+          <Property Name="IdCuenta" Type="Int32" Nullable="false" />
+          <Property Name="NombreSubCuenta" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="debeAnterior" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="haberAnterior" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="debeActual" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="haberActual" Type="Decimal" Precision="19" Scale="4" />
+          <Property Name="saldo" Type="Decimal" Precision="19" Scale="4" />
+          <NavigationProperty Name="Cuenta" Relationship="MontesERPModel.FK_SubCuenta_Cuenta" FromRole="SubCuenta" ToRole="Cuenta" />
+          <NavigationProperty Name="DetalleComprobanteDeDiarios" Relationship="MontesERPModel.FK_DetalleComprobanteDeDiario_SubCuenta" FromRole="SubCuenta" ToRole="DetalleComprobanteDeDiario" />
+        </EntityType>
+        <EntityType Name="SubGrupoCuenta">
+          <Key>
+            <PropertyRef Name="IdSubGrupoCuenta" />
+          </Key>
+          <Property Name="IdSubGrupoCuenta" Type="Int32" Nullable="false" />
+          <Property Name="IdGrupoCuenta" Type="Int32" Nullable="false" />
+          <Property Name="NombreSubGrupoCuenta" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Cuentas" Relationship="MontesERPModel.FK_Cuenta_SubGrupoCuenta" FromRole="SubGrupoCuenta" ToRole="Cuenta" />
+          <NavigationProperty Name="GrupoCuenta" Relationship="MontesERPModel.FK_SubGrupoCuenta_GrupoCuenta" FromRole="SubGrupoCuenta" ToRole="GrupoCuenta" />
+        </EntityType>
+        <Association Name="FK_DetalleComprobanteDeDiario_ComprobanteDeDiario1">
+          <End Type="MontesERPModel.ComprobanteDeDiario" Role="ComprobanteDeDiario" Multiplicity="1" />
+          <End Type="MontesERPModel.DetalleComprobanteDeDiario" Role="DetalleComprobanteDeDiario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ComprobanteDeDiario">
+              <PropertyRef Name="IdComprobanteDeDiario" />
+            </Principal>
+            <Dependent Role="DetalleComprobanteDeDiario">
+              <PropertyRef Name="IdComprobanteDeDiario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Cuenta_SubGrupoCuenta">
+          <End Type="MontesERPModel.SubGrupoCuenta" Role="SubGrupoCuenta" Multiplicity="1" />
+          <End Type="MontesERPModel.Cuenta" Role="Cuenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SubGrupoCuenta">
+              <PropertyRef Name="IdSubGrupoCuenta" />
+            </Principal>
+            <Dependent Role="Cuenta">
+              <PropertyRef Name="IdSubGrupoCuenta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SubCuenta_Cuenta">
+          <End Type="MontesERPModel.Cuenta" Role="Cuenta" Multiplicity="1" />
+          <End Type="MontesERPModel.SubCuenta" Role="SubCuenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Cuenta">
+              <PropertyRef Name="IdCuenta" />
+            </Principal>
+            <Dependent Role="SubCuenta">
+              <PropertyRef Name="IdCuenta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_DetalleComprobanteDeDiario_SubCuenta">
+          <End Type="MontesERPModel.SubCuenta" Role="SubCuenta" Multiplicity="1" />
+          <End Type="MontesERPModel.DetalleComprobanteDeDiario" Role="DetalleComprobanteDeDiario" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SubCuenta">
+              <PropertyRef Name="IdSubCuenta" />
+            </Principal>
+            <Dependent Role="DetalleComprobanteDeDiario">
+              <PropertyRef Name="IdSubCuenta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_SubGrupoCuenta_GrupoCuenta">
+          <End Type="MontesERPModel.GrupoCuenta" Role="GrupoCuenta" Multiplicity="1" />
+          <End Type="MontesERPModel.SubGrupoCuenta" Role="SubGrupoCuenta" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="GrupoCuenta">
+              <PropertyRef Name="IdGrupoCuenta" />
+            </Principal>
+            <Dependent Role="SubGrupoCuenta">
+              <PropertyRef Name="IdGrupoCuenta" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="MontesERPModelStoreContainer" CdmEntityContainer="MontesERPEntities">
+          <EntitySetMapping Name="Productoes">
+            <EntityTypeMapping TypeName="MontesERPModel.Producto">
+              <MappingFragment StoreEntitySet="Producto">
+                <ScalarProperty Name="IdProducto" ColumnName="IdProducto" />
+                <ScalarProperty Name="NombreProducto" ColumnName="NombreProducto" />
+                <ScalarProperty Name="PrecioProducto" ColumnName="PrecioProducto" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ComprobanteDeDiarios">
+            <EntityTypeMapping TypeName="MontesERPModel.ComprobanteDeDiario">
+              <MappingFragment StoreEntitySet="ComprobanteDeDiario">
+                <ScalarProperty Name="NumeroFolio" ColumnName="NumeroFolio" />
+                <ScalarProperty Name="FechaCierre" ColumnName="FechaCierre" />
+                <ScalarProperty Name="FechaInicial" ColumnName="FechaInicial" />
+                <ScalarProperty Name="Concepto" ColumnName="Concepto" />
+                <ScalarProperty Name="IdComprobanteDeDiario" ColumnName="IdComprobanteDeDiario" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Cuentas">
+            <EntityTypeMapping TypeName="MontesERPModel.Cuenta">
+              <MappingFragment StoreEntitySet="Cuenta">
+                <ScalarProperty Name="haberActual" ColumnName="haberActual" />
+                <ScalarProperty Name="debeActual" ColumnName="debeActual" />
+                <ScalarProperty Name="haberAnterior" ColumnName="haberAnterior" />
+                <ScalarProperty Name="debeAnterior" ColumnName="debeAnterior" />
+                <ScalarProperty Name="NombreCuenta" ColumnName="NombreCuenta" />
+                <ScalarProperty Name="IdSubGrupoCuenta" ColumnName="IdSubGrupoCuenta" />
+                <ScalarProperty Name="IdCuenta" ColumnName="IdCuenta" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DetalleComprobanteDeDiarios">
+            <EntityTypeMapping TypeName="MontesERPModel.DetalleComprobanteDeDiario">
+              <MappingFragment StoreEntitySet="DetalleComprobanteDeDiario">
+                <ScalarProperty Name="Haber" ColumnName="Haber" />
+                <ScalarProperty Name="Debe" ColumnName="Debe" />
+                <ScalarProperty Name="IdSubCuenta" ColumnName="IdSubCuenta" />
+                <ScalarProperty Name="IdComprobanteDeDiario" ColumnName="IdComprobanteDeDiario" />
+                <ScalarProperty Name="IdDetalleComprobanteDeDiario" ColumnName="IdDetalleComprobanteDeDiario" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GrupoCuentas">
+            <EntityTypeMapping TypeName="MontesERPModel.GrupoCuenta">
+              <MappingFragment StoreEntitySet="GrupoCuenta">
+                <ScalarProperty Name="NombreGrupoCuenta" ColumnName="NombreGrupoCuenta" />
+                <ScalarProperty Name="IdGrupoCuenta" ColumnName="IdGrupoCuenta" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SubCuentas">
+            <EntityTypeMapping TypeName="MontesERPModel.SubCuenta">
+              <MappingFragment StoreEntitySet="SubCuenta">
+                <ScalarProperty Name="saldo" ColumnName="saldo" />
+                <ScalarProperty Name="haberActual" ColumnName="haberActual" />
+                <ScalarProperty Name="debeActual" ColumnName="debeActual" />
+                <ScalarProperty Name="haberAnterior" ColumnName="haberAnterior" />
+                <ScalarProperty Name="debeAnterior" ColumnName="debeAnterior" />
+                <ScalarProperty Name="NombreSubCuenta" ColumnName="NombreSubCuenta" />
+                <ScalarProperty Name="IdCuenta" ColumnName="IdCuenta" />
+                <ScalarProperty Name="IdSubCuenta" ColumnName="IdSubCuenta" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SubGrupoCuentas">
+            <EntityTypeMapping TypeName="MontesERPModel.SubGrupoCuenta">
+              <MappingFragment StoreEntitySet="SubGrupoCuenta">
+                <ScalarProperty Name="NombreSubGrupoCuenta" ColumnName="NombreSubGrupoCuenta" />
+                <ScalarProperty Name="IdGrupoCuenta" ColumnName="IdGrupoCuenta" />
+                <ScalarProperty Name="IdSubGrupoCuenta" ColumnName="IdSubGrupoCuenta" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

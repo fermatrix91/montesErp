@@ -1,0 +1,318 @@
+﻿@model List<MontesERP.Models.Contabilidad.ComprobanteObj>
+@{
+    ViewBag.Title = "Comprobantes";
+    Layout = "~/Views/Shared/_LayoutErp.cshtml";
+}
+<h2>SubCuentas</h2>
+
+<table id="example" class="display table table-striped table-responsive">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Concepto</th>
+            <th>Fecha Inicial</th>
+            <th>Fecha Cierre</th>
+            <th><button id="nuevoComprobante" class="btn btn-info" data-toggle="tooltip" title="Nuevo Comprobante"><span class="glyphicon glyphicon-plus"></span></button></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>No.</th>
+            <th>Concepto</th>
+            <th>Fecha Inicial</th>
+            <th>Fecha Cierre</th>
+            <th></th>
+        </tr>
+    </tfoot>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @item.NumeroFolio
+            </td>
+            <td>
+                @item.Concepto
+            </td>
+            <td>
+                @item.FechaInicial
+            </td>
+            <td>
+                @item.FechaCierre
+            </td>
+            <td>
+                <button data-toggle="tooltip" title="Editar Comprobante" class="btn btn-primary detalleDeComprobante" data-id="@item.IdComprobante"><span class="glyphicon glyphicon-pencil"></span></button>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<style>
+    .estiloInputs {
+        height: 25px !Important;
+        font-size: 14px !Important;
+    }
+
+    #dropDownSubCuentas {
+        font-size: 14px !Important;
+        padding: 0 0 0 7px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+
+        var idsDeSubCuentas = { data: [] };
+        var datosDetalleComprobante = [['Id', 'SubCuenta', 'Debe', 'Haber', '_']];
+
+        var idComprobanteActual = 0;
+        var esNuevoRegistro = true;
+
+        $('[data-toggle="tooltip"]').tooltip();
+
+        function desbloquear()
+        { $('#contieneModalDetalleComprobante').unblock(); }
+        function bloquear() {
+            $('#contieneModalDetalleComprobante').block({
+                message: '<h3>Cargando</h3>', css: {
+                    border: 'none',
+                    padding: '15px',
+                    backgroundColor: '#000',
+                    '-webkit-border-radius': '10px',
+                    '-moz-border-radius': '10px',
+                    opacity: .5,
+                    color: '#fff'
+                }
+            });
+        }
+
+        $(".detalleDeComprobante").click(function () {
+            var idComprobante = $(this).attr('data-id');
+            $('#numeroSubcuenta').val($('#dropDownSubCuentas option:selected').val());
+
+            esNuevoRegistro = false;
+
+            $.ajax({
+                type: "POST",
+                async: true,
+                cache: false,
+                url: '/Contabilidad/DetalleComprobante',
+                context: document.body,
+                data: { idComprobante: idComprobante },
+                beforeSend: function () {
+                    //ventanaBloquear();
+                    bloquear();
+                },
+                complete: function () {
+                    //$.unblockUI();
+                },
+                success: function (data) {
+                    $('#tituloDetalleComprobante').text('Editar Comprobante');
+                    $('#modalComprobante').modal();
+
+                    jQuery.each(data.ListaSubCuentas, function (indice, cuenta) {
+                        idsDeSubCuentas.data.push(cuenta.IdSubCuenta);
+                        $('#dropDownSubCuentas').append(
+                            $('<option></option>').val(cuenta.IdSubCuenta).html(cuenta.SubCuenta)
+                         );
+                    });
+
+                    $('#dropDownSubCuentas').val(data.DetalleDeSubCuenta[0].IdSubCuenta);
+
+                    desbloquear();
+                    //alert(JSON.stringify(data));
+                }
+            });
+
+        });
+
+        $('#nuevoComprobante').click(function () {
+            $('#tituloDetalleComprobante').text('Nuevo Comprobante');
+            $('#numeroSubcuenta').val($('#dropDownSubCuentas option:selected').val());
+
+            esNuevoRegistro = true;
+
+            $.ajax({
+                type: "POST",
+                async: true,
+                cache: false,
+                url: '/Contabilidad/DetalleComprobante',
+                context: document.body,
+                data: { idComprobante: "0" },
+                beforeSend: function () {
+                    bloquear();
+                    //ventanaBloquear();
+                },
+                complete: function () {
+                    //$.unblockUI();
+                },
+                success: function (data) {
+
+                    $('.estiloInputs').eq(3).focus(); //Ubicarse en el Concepto
+
+                    idComprobanteActual = data.DetalleComprobante.Comprobante.IdComprobante;
+
+                    $('#numeroFolioComprobante').text(data.DetalleComprobante.Comprobante.NumeroFolio);
+                    $('#fechaInicialComprobante').text(data.DetalleComprobante.Comprobante.FechaInicial);
+                    $('#conceptoComprobante').text(data.DetalleComprobante.Comprobante.Concepto);
+
+                    jQuery.each(data.ListaSubCuentas, function (indice, cuenta) {
+                        idsDeSubCuentas.data.push(cuenta.IdSubCuenta);
+                        $('#dropDownSubCuentas').append(
+                            $('<option></option>').val(cuenta.IdSubCuenta).html(cuenta.SubCuenta)
+                         );
+                    });
+
+                    $('#dropDownSubCuentas').val(data.ListaSubCuentas[0].IdSubCuenta);
+                    //alert(JSON.stringify(data));
+                    $('#modalComprobante').modal();
+                    desbloquear();
+                }
+            });
+        });
+
+        $('#formGuardaComprobante').submit(function (e) {
+            $('#idCuentaAEnviar').val($('#dropDownSubCuentas').val());
+            $('#idSubCuentaAEnviar').val($('#inicioIdSubCuenta').text());
+            $('#nombreCuentaAEnviar').val($('#nombreSubCuenta').val());
+
+            return true;
+        });
+
+        $('#guardarComprobante').click(function (e) {
+            var sumaDebe = +0;
+            var sumaHaber = +0;
+
+            jQuery.each(datosDetalleComprobante, function (indice, debe) {
+                if (indice > 0)
+                    if (parseFloat(debe[2]))
+                        sumaDebe += +debe[2];
+            });
+
+            jQuery.each(datosDetalleComprobante, function (indice, haber) {
+                if (indice > 0)
+                    if (parseFloat(haber[3]))
+                        sumaHaber += +haber[3];
+            });
+
+            if (sumaDebe === sumaHaber && (sumaDebe !== 0 && sumaHaber !== 0)) {
+                bloquear();
+                $('#formGuardaComprobante').submit();
+            } else {
+                alert('Los datos no cuadran');
+                e.preventDefault();
+            }
+        });
+
+        function agregoDetalle() {
+            $('#debeComprobante').val('');
+            $('#haberComprobante').val('');
+
+            $('#numeroSubcuenta').focus();   //Ubicarse en debe
+            $('#numeroSubcuenta').select();
+            $("#numeroSubcuenta").mouseup(function (e) {
+                e.preventDefault();
+            });
+        }
+
+        $(".estiloInputs").keyup(function (e) {
+            if (e.which === 13) {
+                var index = $('.estiloInputs').index(this) + 1;
+                if (index === 3)
+                    index = 4;
+                $('.estiloInputs').eq(index).focus();
+
+                if (index === 9)
+                    $('#agregarMovimiento').focus();
+            }
+        });
+
+        //$('#divTablaDetalleComprobante').append('<section class="table"></section>');
+        //var tablaDetalle = $('#divTablaDetalleComprobante').children();
+        $('#agregarMovimiento').keyup(function (e) {
+            if (e.which === 13) {
+                agregoDetalle();
+            };
+        });
+
+        $('#agregarMovimiento').click(function () {
+            if (($('#debeComprobante').val() != "" || $('#haberComprobante').val() != ""))
+                if (!isNaN($('#debeComprobante').val()) && !isNaN($('#haberComprobante').val())) {
+
+                    $('#divTablaDetalleComprobante').empty();
+
+                    datosDetalleComprobante.push([$('#dropDownSubCuentas option:selected').val(),
+                                                    $('#dropDownSubCuentas option:selected').text(),
+                                                    $('#debeComprobante').val(), $('#haberComprobante').val(),
+                                                    '<button class="quitarFila btn btn-danger"><span class="glyphicon glyphicon-minus"></span>' +
+                                                    '<input type="hidden" value="' + datosDetalleComprobante.length + '" /></button>']);
+
+                    var table = arrayToTable(datosDetalleComprobante, {
+                        thead: true,
+                        attrs: { class: 'table' }
+                    });
+
+                    $('#divTablaDetalleComprobante').append(table);
+
+                    $('#debeComprobante').val('');
+                    $('#haberComprobante').val('');
+                }
+            // agregoDetalle();
+        });
+
+        $('#divTablaDetalleComprobante').on('click', '.quitarFila', function () {
+            $(this).closest('tr').remove();
+            var adf = $(this).children();
+            var hijoInput = adf[1].value;
+            datosDetalleComprobante.splice(hijoInput);
+        });
+
+        $('#dropDownSubCuentas').change(function () {
+            $('#numeroSubcuenta').val($('#dropDownSubCuentas option:selected').val());
+            $('#debeComprobante').focus();   //Ubicarse en debe
+        });
+
+        var sape = { data: ["Oye", "Sape"] };
+
+        $('#numeroSubcuenta').easyAutocomplete(idsDeSubCuentas);//$('#dropDownSubCuentas option').val());
+        $('#numeroSubcuenta').change(function () {
+            $('#dropDownSubCuentas').val($('#numeroSubcuenta').val());
+            $('#debeComprobante').focus();
+        });
+
+        $('#numeroSubcuenta').keyup(function (e) {
+            if (e.which === 38 || e.which === 40) {
+                $('#dropDownSubCuentas').val($('#numeroSubcuenta').val());
+            }
+            if (e.which === 13) {
+                $('#dropDownSubCuentas').val($('#numeroSubcuenta').val());
+                $('#debeComprobante').focus();
+            }
+        });
+
+        $('#example').DataTable({
+            "language": {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando registros encontrados: 0",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sSearch": "Buscar:",
+                "sUrl": "",
+                "sInfoThousands": ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+                }
+            }
+        });
+    });
+</script>

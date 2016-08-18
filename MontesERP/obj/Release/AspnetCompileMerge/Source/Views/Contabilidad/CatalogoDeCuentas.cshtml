@@ -1,0 +1,84 @@
+﻿@model List<MontesERP.Models.Contabilidad.CuentaObj>
+@{
+    ViewBag.Title = "CatalogoDeCuentas";
+    Layout = "~/Views/Shared/_LayoutErp.cshtml";
+}
+
+<h2>CatalogoDeCuentas</h2>
+
+<table id="example" class="display table table-striped table-responsive" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Grupo</th>
+            <th>SubGrupo</th>
+            <th>Código</th>
+            <th>Cuenta</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>Grupo</th>
+            <th>SubGrupo</th>
+            <th>Código</th>
+            <th>Cuenta</th>
+            <th></th>
+        </tr>
+    </tfoot>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.Grupo
+                </td>
+                <td>
+                    @item.SubGrupo
+                </td>
+                <td>
+                    @item.IdCuenta
+                </td>
+                <td>
+                    @item.Cuenta
+                </td>
+                <td>
+                    <form action="/Contabilidad/SubCuentas" method="POST">
+                        <input type="hidden" name="idCuenta" value="@item.IdCuenta" />
+                        <button class="btn btn-primary verSubCuentas" type="submit"><span class="glyphicon glyphicon-zoom-in"></span></button>
+                        @*<button class="btn-primary verSubCuentas" data-id="@item.IdCuenta">Ver</button>*@
+                    </form>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+
+        $('#example').DataTable({
+            "language": {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando registros encontrados: 0",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sSearch": "Buscar:",
+                "sUrl": "",
+                "sInfoThousands": ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+                }
+            }
+        });
+    });
+</script>

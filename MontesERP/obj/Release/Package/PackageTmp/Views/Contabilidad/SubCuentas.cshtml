@@ -1,0 +1,262 @@
+﻿@model List<MontesERP.Models.Contabilidad.SubCuentaObj>
+@{
+    ViewBag.Title = "SubCuentas";
+    Layout = "~/Views/Shared/_LayoutErp.cshtml";
+}
+
+<h2>SubCuentas</h2>
+
+<table id="example" class="display table table-striped table-responsive">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>SubCuenta</th>
+            <th><button id="nuevaCuenta" class="btn btn-info" data-toggle="tooltip" title="Nueva SubCuenta"><span class="glyphicon glyphicon-plus"></span></button></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th>Código</th>
+            <th>SubCuenta</th>
+            <th></th>
+        </tr>
+    </tfoot>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.IdSubCuenta
+                </td>
+                <td>
+                    @item.SubCuenta
+                </td>
+                <td>
+                    <button data-toggle="tooltip" title="Editar SubCuenta" class="btn btn-primary detalleDeCuenta" data-id="@item.IdSubCuenta"><span class="glyphicon glyphicon-pencil"></span></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+<style>
+    .estiloInputs {
+        height: 25px !Important;
+        font-size: 14px !Important;
+    }
+
+    #dropDownCuentas {
+        font-size: 14px !Important;
+        padding: 0 0 0 7px;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+
+        var esNuevoRegistro = true;
+        var idCuentaActual = "";
+        var idSubCuentaActual = "";
+        var nombreSubCuentaActual = "";
+
+        $('[data-toggle="tooltip"]').tooltip();
+
+        function desbloquear()
+        { $('#contieneModalDetalleSubCuenta').unblock(); }
+        function bloquear() {
+            $('#contieneModalDetalleSubCuenta').block({
+                message: '<h3>Cargando</h3>', css: {
+                    border: 'none',
+                    padding: '15px',
+                    backgroundColor: '#000',
+                    '-webkit-border-radius': '10px',
+                    '-moz-border-radius': '10px',
+                    opacity: .5,
+                    color: '#fff'
+                }
+            });
+        }
+
+        $(".detalleDeCuenta").click(function () {
+            var idSubCuenta = $(this).attr('data-id');
+            $('#dropDownCuentas').attr('disabled', 'disabled');
+            esNuevoRegistro = false;
+
+            $.ajax({
+                type: "POST",
+                async: true,
+                cache: false,
+                url: '/Contabilidad/DetalleSubCuenta',
+                context: document.body,
+                data: { idSubCuenta: idSubCuenta },
+                beforeSend: function () {
+                    //ventanaBloquear();
+                    bloquear();
+                },
+                complete: function () {
+                    //$.unblockUI();
+                },
+                success: function (data) {
+                    $('#tituloDetalleSubCuenta').text('Editar SubCuenta');
+                    $('#modalSubCuenta').modal();
+
+                    jQuery.each(data.ListaCuentas, function (indice, cuenta) {
+                        $('#dropDownCuentas').append(
+                            $('<option></option>').val(cuenta.IdCuenta).html(cuenta.Cuenta)
+                         //$('<option></option>').val(data.ListaCuentas[0].IdCuenta).html(data.ListaCuentas[0].Cuenta)
+                         );
+                    });
+
+                    $('#inicioIdSubCuenta').text(data.DetalleDeSubCuenta[0].IdSubCuenta);
+                    $('#idSubCuenta').val(data.DetalleDeSubCuenta[0].IdSubCuenta);
+                    $('#nombreSubCuenta').val(data.DetalleDeSubCuenta[0].NombreSubCuenta);
+                    $('#dropDownCuentas').val(data.DetalleDeSubCuenta[0].IdCuenta);
+
+                    desbloquear();
+                    //alert(JSON.stringify(data));
+                }
+            });
+
+        });
+
+        function traerIdSubCuenta() {
+            $.ajax({
+                type: "POST",
+                async: true,
+                cache: false,
+                url: '/Contabilidad/IdSubCuentaActual',
+                context: document.body,
+                data: { idCuenta: $('#dropDownCuentas').val() },
+                beforeSend: function () {
+                    bloquear();
+                    //ventanaBloquear();
+                },
+                complete: function () {
+                    //$.unblockUI();
+                },
+                success: function (data) {
+
+                    $('#inicioIdSubCuenta').text(data);
+                    //alert(JSON.stringify(data));
+                    $('#modalSubCuenta').modal();
+                    desbloquear();
+                }
+            });
+        }
+
+        $('#nuevaCuenta').click(function () {
+            $('#tituloDetalleSubCuenta').text('Nueva SubCuenta');
+            $('#dropDownCuentas').removeAttr('disabled');
+            esNuevoRegistro = true;
+
+            $('#idSubCuenta').val('');
+            $('#nombreSubCuenta').val('');
+
+            $.ajax({
+                type: "POST",
+                async: true,
+                cache: false,
+                url: '/Contabilidad/DetalleSubCuenta',
+                context: document.body,
+                data: { idSubCuenta: "0" },
+                beforeSend: function () {
+                    bloquear();
+                    //ventanaBloquear();
+                },
+                complete: function () {
+                    //$.unblockUI();
+                },
+                success: function (data) {
+
+                    jQuery.each(data.ListaCuentas, function (indice, cuenta) {
+                        $('#dropDownCuentas').append(
+                            $('<option></option>').val(cuenta.IdCuenta).html(cuenta.Cuenta)
+                         //$('<option></option>').val(data.ListaCuentas[0].IdCuenta).html(data.ListaCuentas[0].Cuenta)
+                         );
+                    });
+
+                    $('#dropDownCuentas').val(data.ListaCuentas[0].IdCuenta);
+                    //alert(JSON.stringify(data));
+                    $('#modalSubCuenta').modal();
+                    traerIdSubCuenta();
+                }
+            });
+        });
+        $('#dropDownCuentas').change(function () {
+            traerIdSubCuenta();
+        });
+
+        $('#formGuardaSubCuenta').submit(function (e) {
+            $('#idCuentaAEnviar').val($('#dropDownCuentas').val());
+            $('#idSubCuentaAEnviar').val($('#inicioIdSubCuenta').text());
+            $('#nombreCuentaAEnviar').val($('#nombreSubCuenta').val());
+
+            return true;
+        });
+
+        $('#guardarSubCuenta').click(function () {
+            bloquear();
+            $('#formGuardaSubCuenta').submit();
+        });
+
+        //int idCuenta, int idSubCuenta, string nombreCuenta)
+        //$('#guardarSubCuenta').click(function () {
+        //    $.ajax({
+        //        type: "POST",
+        //        async: true,
+        //        cache: false,
+        //        url: '/Contabilidad/GuardarSubCuenta',
+        //        context: document.body,
+        //        data: { idCuenta: $('#dropDownCuentas').val(), idSubCuenta: $('#inicioIdSubCuenta').text(), nombreCuenta: $('#nombreSubCuenta').val() },
+        //        beforeSend: function () {
+        //            bloquear();
+        //            //ventanaBloquear();
+        //        },
+        //        complete: function () {
+        //            //$.unblockUI();
+        //        },
+        //        success: function (data) {
+        //            $('#dropDownCuentas').empty();
+        //            //jQuery.each(data.ListaCuentas, function (indice, cuenta) {
+        //            //    $('#dropDownCuentas').append(
+        //            //        $('<option></option>').val(cuenta.IdCuenta).html(cuenta.Cuenta)
+        //            //     //$('<option></option>').val(data.ListaCuentas[0].IdCuenta).html(data.ListaCuentas[0].Cuenta)
+        //            //     );
+        //            //});
+
+        //            //$('#dropDownCuentas').val(data.ListaCuentas[0].IdCuenta);
+        //            ////alert(JSON.stringify(data));
+        //            //$('#modalSubCuenta').modal();
+        //            //traerIdSubCuenta();
+        //            desbloquear();
+        //        }
+        //    });
+        //});
+
+
+        $('#example').DataTable({
+            "language": {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sEmptyTable": "Ningún dato disponible en esta tabla",
+                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando registros encontrados: 0",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix": "",
+                "sSearch": "Buscar:",
+                "sUrl": "",
+                "sInfoThousands": ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+                }
+            }
+        });
+    });
+</script>
