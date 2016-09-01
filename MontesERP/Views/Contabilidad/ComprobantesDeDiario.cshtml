@@ -3,7 +3,9 @@
     ViewBag.Title = "Comprobantes";
     Layout = "~/Views/Shared/_LayoutErp.cshtml";
 }
-<h2>SubCuentas</h2>
+
+<br />
+<h3 style="text-align: center;">Comprobantes de Diario</h3>
 
 <table id="example" class="display table table-striped table-responsive">
     <thead>
@@ -28,23 +30,23 @@
 
         @foreach (var item in Model)
         {
-        <tr>
-            <td>
-                @item.NumeroFolio
-            </td>
-            <td>
-                @item.Concepto
-            </td>
-            <td>
-                @item.FechaInicial
-            </td>
-            <td>
-                @item.FechaCierre
-            </td>
-            <td>
-                <button data-toggle="tooltip" title="Editar Comprobante" class="btn btn-primary detalleDeComprobante" data-id="@item.IdComprobante"><span class="glyphicon glyphicon-pencil"></span></button>
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    @item.NumeroFolio
+                </td>
+                <td>
+                    @item.Concepto
+                </td>
+                <td>
+                    @item.FechaInicial
+                </td>
+                <td>
+                    @item.FechaCierre
+                </td>
+                <td>
+                    <button data-toggle="tooltip" title="Editar Comprobante" class="btn btn-primary detalleDeComprobante" data-id="@item.IdComprobante"><span class="glyphicon glyphicon-pencil"></span></button>
+                </td>
+            </tr>
         }
     </tbody>
 </table>
@@ -174,9 +176,21 @@
         });
 
         $('#formGuardaComprobante').submit(function (e) {
-            $('#idCuentaAEnviar').val($('#dropDownSubCuentas').val());
-            $('#idSubCuentaAEnviar').val($('#inicioIdSubCuenta').text());
-            $('#nombreCuentaAEnviar').val($('#nombreSubCuenta').val());
+            //$('#idCuentaAEnviar').val($('#dropDownSubCuentas').val());
+            //$('#idSubCuentaAEnviar').val($('#inicioIdSubCuenta').text());
+            //$('#nombreCuentaAEnviar').val($('#nombreSubCuenta').val());
+            var movimientosJson = [];
+
+            jQuery.each(datosDetalleComprobante, function (indice, debe) {
+                if (indice > 0) {
+                    movimientosJson[indice - 1] = { IdSubCuenta: debe[0], NombreSubCuenta: debe[1] , Debe: debe[2], Haber: debe[3] };
+                }
+            });
+                        
+            $('#idComprobante').val(idComprobanteActual);
+            $('#movimientos').val(JSON.stringify(movimientosJson));
+            $('#conceptoActual').val($('#conceptoComprobante').val());
+            $('#fechaActual').val($('input[type="date"]').val())//$('#fechaInicialComprobante').val());
 
             return true;
         });

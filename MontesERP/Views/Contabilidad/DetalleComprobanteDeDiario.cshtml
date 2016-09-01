@@ -1,0 +1,106 @@
+﻿<div>
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div style="height: 45px;" class="modal-header">
+                <span style="float: left;" class="glyphicon glyphicon-wrench"></span>
+                <p style="float: left; font-weight: bold; margin-left: 5px;" id="tituloDetalleComprobante" class="modal-title"></p>
+                <button type="button" class="close" data-dismiss="modal" style="font-size: 30px; margin-top: -8px;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-2 col-sm-2 col-lg-2">
+                        <p>No.:</p>
+                    </div>
+                    <div class="col-xs-2 col-sm-2 col-lg-2">
+                        <p disabled="disabled" style="font-weight: bold;" id="numeroFolioComprobante"></p>
+                    </div>
+
+                    <div class="col-xs-3 col-sm-3 col-lg-3">
+                        <p>Fecha Inicial:</p>
+                    </div>
+                    <div class="col-xs-5 col-sm-5 col-lg-5">
+                        <input type="date" class="form-control estiloInputs" id="fechaInicialComprobante" />
+                    </div>
+                </div>
+
+                <p></p>
+
+                <div class="row">
+                    <div class="col-xs-12 col-sm-2 col-lg-2">
+                        <p>Concepto:</p>
+                    </div>
+                    <div class="col-xs-12 col-sm-10 col-lg-10">
+                        <input type="text" class="form-control estiloInputs" id="conceptoComprobante" placeholder="Concepto Aquí" />
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row">
+                    <div class="col-xs-2 col-sm-2 col-lg-2">
+                        <p>Cuenta:</p>
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-lg-3">
+                        <input id="numeroSubcuenta" class="form-control estiloInputs" type="text" placeholder="#########" />
+                    </div>
+                    <div class="col-xs-7 col-sm-7 col-lg-7">
+                        <select class="form-control estiloInputs" id="dropDownSubCuentas"></select>
+                    </div>
+                </div>
+
+                <p></p>
+
+                <div class="row">
+                    <div class="col-xs-2 col-sm-2 col-lg-2">
+                        <p>Debe:</p>
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-lg-3">
+                        <input class="form-control estiloInputs" type="text" id="debeComprobante" placeholder="0" />
+                    </div>
+
+                    <div class="col-xs-2 col-sm-2 col-lg-2">
+                        <p>Haber:</p>
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-lg-3">
+                        <input class="form-control estiloInputs" type="text" id="haberComprobante" placeholder="0" />
+                    </div>
+                    <div class="col-xs-2 col-sm-2 col-lg-2">
+                        <button id="agregarMovimiento" style="float: right;" class="btn btn-info"><span class="glyphicon glyphicon-chevron-down"></span></button>
+                    </div>
+                </div>
+
+                <p></p>
+
+                @*Movimientos*@
+                <div class="row">
+                    <div style="max-height: 400px; overflow: auto;" id="divTablaDetalleComprobante">
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <form id="formGuardaComprobante" action="/Contabilidad/GuardarComprobante" method="POST">
+                    <button id="guardarComprobante" type="submit" class="btn btn-success"><span class="glyphicon glyphicon-check"></span></button>
+                    @*<input id="idCuentaAEnviar" name="idCuenta" type="hidden" value="" />
+                    <input id="idSubCuentaAEnviar" name="idSubCuenta" type="hidden" value="" />
+                    <input id="nombreCuentaAEnviar" name="nombreCuenta" type="hidden" value="" />*@
+                    <input id="movimientos" name="movimientos" type="hidden" />
+                    <input id="idComprobante" name="idComprobante" type="hidden" />
+                    <input id="conceptoActual" name="conceptoActual" type="hidden" />
+                    <input id="fechaActual" name="fechaActual" type="hidden" />
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    #eac-container-numeroSubcuenta {
+        max-height: 120px !important;
+        overflow: auto;
+    }
+</style>

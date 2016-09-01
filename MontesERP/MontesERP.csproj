@@ -571,6 +571,8 @@
     <Content Include="Views\Contabilidad\SubCuentas.cshtml" />
     <Content Include="Views\Contabilidad\ComprobantesDeDiario.cshtml" />
     <Content Include="Views\Shared\_LayoutErp.cshtml" />
+    <Content Include="Views\Contabilidad\DetalleComprobanteDeDiario.cshtml" />
+    <Content Include="Views\Contabilidad\DetalleSubCuenta.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

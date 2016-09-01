@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using MontesERP.Models.DAL;
+using System.Web.Script.Serialization;
 
 namespace MontesERP.Controllers
 {
@@ -15,6 +16,8 @@ namespace MontesERP.Controllers
         public readonly MontesERPEntities modeloErp = new MontesERPEntities();
         public readonly Cuentas cuentas = new Cuentas();
         public readonly ComprobantesDiario comprobantes = new ComprobantesDiario();
+
+        public List<DetalleComprobanteDeDiario> ListaInicialDetalleComprobante { get; set; }
 
         public ActionResult Index()
         {
@@ -97,7 +100,7 @@ namespace MontesERP.Controllers
         [Authorize]
         public ActionResult ComprobantesDeDiario()
         {
-            return View("ComprobantesDeDiario",comprobantes.ListadoDeComprobantes());
+            return View("ComprobantesDeDiario", comprobantes.ListadoDeComprobantes());
         }
 
         [Authorize]
@@ -110,6 +113,178 @@ namespace MontesERP.Controllers
                 ListaSubCuentas = cuentas.ListadoTotalDeSubCuentas(),
                 DetalleComprobante = comprobante.DetalleDeComprobante(idComprobante)
             }, JsonRequestBehavior.AllowGet);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult GuardarComprobante(int idComprobante, string movimientos, string conceptoActual, string fechaActual)
+        {
+            decimal sumaDebe = 0;
+            decimal sumaHaber = 0;
+
+            var listaJSON = new JavaScriptSerializer();
+            List<ElementoComprobante> listaElementoComprobante = listaJSON.Deserialize<List<ElementoComprobante>>(movimientos);
+
+            foreach (var detalle in listaElementoComprobante)
+            {
+                sumaDebe += string.IsNullOrWhiteSpace(detalle.Debe) ? 0 : Convert.ToDecimal(detalle.Debe);
+                sumaHaber += string.IsNullOrWhiteSpace(detalle.Haber) ? 0 : Convert.ToDecimal(detalle.Haber);
+            }
+
+
+            DateTime fechaActualTemporal;
+
+            if (sumaDebe == sumaHaber && (sumaDebe != 0 || sumaDebe != 0)
+                && !string.IsNullOrWhiteSpace(conceptoActual) && DateTime.TryParse(fechaActual, out fechaActualTemporal))
+            {
+                try
+                {
+                    ////Guarda datos De Comprobante de Diario
+                    ComprobanteDeDiario comprobanteDiario = new ComprobanteDeDiario();
+
+                    if (idComprobante != 0)
+                    {
+                        comprobanteDiario = modeloErp.ComprobanteDeDiarios.Find(idComprobante);
+                        comprobanteDiario.FechaInicial = fechaActualTemporal.Date;
+                        comprobanteDiario.Concepto = conceptoActual;
+                        modeloErp.ComprobanteDeDiarios.Attach(comprobanteDiario);
+                        modeloErp.Entry(comprobanteDiario).State = EntityState.Modified;
+                        modeloErp.SaveChanges();
+                    }
+                    else
+                    {
+                        comprobanteDiario.FechaInicial = fechaActualTemporal.Date;
+                        comprobanteDiario.Concepto = conceptoActual;
+                        modeloErp.ComprobanteDeDiarios.Add(comprobanteDiario);
+                        modeloErp.Entry(comprobanteDiario).State = EntityState.Added;
+                        modeloErp.SaveChanges();
+
+                        idComprobante = (from comprobante in modeloErp.ComprobanteDeDiarios
+                                         select comprobanteDiario.IdComprobanteDeDiario).Max();
+                    }
+
+
+                    //////Revertir saldo de subcuentas
+                    foreach (var detalle in listaElementoComprobante)//this.ListaInicialDetalleComprobante)
+                    {
+                        int idSubCuenta = Convert.ToInt32(detalle.IdSubCuenta);
+
+                        SubCuenta subCuenta = modeloErp.SubCuentas.Find(idSubCuenta);
+                        subCuenta.debeAnterior = subCuenta.debeActual;
+                        subCuenta.haberAnterior = subCuenta.haberActual;
+
+                        subCuenta.debeActual = subCuenta.debeActual - Convert.ToDecimal(detalle.Debe);
+                        subCuenta.haberActual = subCuenta.haberActual - Convert.ToDecimal(detalle.Haber);
+
+                        //Saldo
+                        switch (subCuenta.Cuenta.SubGrupoCuenta.GrupoCuenta.IdGrupoCuenta)
+                        {
+                            case 1:
+                                subCuenta.saldo = subCuenta.debeActual - subCuenta.haberActual;
+                                break;
+
+                            case 2:
+                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
+                                break;
+
+                            case 3:
+                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
+                                break;
+
+                            case 4:
+                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
+                                break;
+
+                            case 5:
+                                subCuenta.saldo = subCuenta.debeActual - subCuenta.haberActual;
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        modeloErp.SubCuentas.Attach(subCuenta);
+                        modeloErp.Entry(subCuenta).State = EntityState.Modified;
+                        modeloErp.SaveChanges();
+                    }
+
+                    ///Eliminar detalle Anterior
+                    ///
+                    foreach (var detalle in this.ListaInicialDetalleComprobante)
+                    {
+                        modeloErp.DetalleComprobanteDeDiarios.Attach(detalle);
+                        modeloErp.Entry(detalle).State = EntityState.Deleted;
+                        modeloErp.SaveChanges();
+                    }
+
+
+                    ////Guardar detalle Comprobante de Diario
+                    foreach (var detalle in listaElementoComprobante)
+                    {
+                        DetalleComprobanteDeDiario detalleComprobante = new DetalleComprobanteDeDiario();
+                        detalleComprobante.Debe = Convert.ToDecimal(detalle.Debe);
+                        detalleComprobante.Haber = Convert.ToDecimal(detalle.Haber);
+                        detalleComprobante.IdComprobanteDeDiario = idComprobante;
+                        detalleComprobante.IdSubCuenta = Convert.ToInt32(detalle.IdSubCuenta);
+
+                        SubCuenta subCuenta = modeloErp.SubCuentas.Find(detalleComprobante.IdSubCuenta);
+                        subCuenta.debeAnterior = subCuenta.debeActual;
+                        subCuenta.haberAnterior = subCuenta.haberActual;        //Asignar debe y haber anterior
+
+
+                        ///Acumular debe y haber
+                        subCuenta.debeActual = subCuenta.debeActual + detalleComprobante.Debe;
+                        subCuenta.haberActual = subCuenta.haberActual + detalleComprobante.Haber;
+
+                        //Saldo
+                        switch (subCuenta.Cuenta.SubGrupoCuenta.GrupoCuenta.IdGrupoCuenta)
+                        {
+                            case 1:
+                                subCuenta.saldo = subCuenta.debeActual - subCuenta.haberActual;
+                                break;
+
+                            case 2:
+                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
+                                break;
+
+                            case 3:
+                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
+                                break;
+
+                            case 4:
+                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
+                                break;
+
+                            case 5:
+                                subCuenta.saldo = subCuenta.debeActual - subCuenta.haberActual;
+                                break;
+
+                            default:
+                                break;
+                        }
+
+                        modeloErp.DetalleComprobanteDeDiarios.Add(detalleComprobante); // Agrega movimientos
+                        modeloErp.Entry(subCuenta).State = EntityState.Added;
+
+                        modeloErp.SubCuentas.Attach(subCuenta);        //Actualiza cuenta
+                        modeloErp.Entry(subCuenta).State = EntityState.Modified;
+
+                        modeloErp.SaveChanges();
+                    }
+                    //MessageBox.Show("Operación realizada con éxito");
+
+                }
+                catch (Exception mensaje)
+                {
+                    //MessageBox.Show("Error Inesperado en el Server");
+                }
+            }
+            //else
+            //{
+            //    MessageBox.Show("No Cuadra");
+            //}
+
+            return RedirectToAction("ComprobantesDeDiario", "Contabilidad");
         }
 
     }
