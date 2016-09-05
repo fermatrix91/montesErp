@@ -32,7 +32,7 @@
         {
             <tr>
                 <td>
-                    @item.NumeroFolio
+                    @item.NumeroComprobante
                 </td>
                 <td>
                     @item.Concepto
@@ -112,7 +112,20 @@
                 },
                 success: function (data) {
                     $('#tituloDetalleComprobante').text('Editar Comprobante');
-                    $('#modalComprobante').modal();
+
+                    $('.estiloInputs').eq(3).focus(); //Ubicarse en el Concepto
+
+                    idComprobanteActual = data.DetalleComprobante.Comprobante.IdComprobante;
+
+                    $('#numeroComprobante').text(data.DetalleComprobante.Comprobante.NumeroComprobante);
+
+                    var fechita = data.DetalleComprobante.Comprobante.FechaInicial;
+                    var formato = fechita.split("/");
+                    var fechaPro = formato[1] + "/" + formato[0] + "/" + formato[2];
+                    var fechaResultante = new Date(fechaPro);
+
+                    $('#fechaInicialComprobante').val(getFormattedDate(fechaResultante));
+                    $('#conceptoComprobante').val(data.DetalleComprobante.Comprobante.Concepto);
 
                     jQuery.each(data.ListaSubCuentas, function (indice, cuenta) {
                         idsDeSubCuentas.data.push(cuenta.IdSubCuenta);
@@ -121,14 +134,50 @@
                          );
                     });
 
-                    $('#dropDownSubCuentas').val(data.DetalleDeSubCuenta[0].IdSubCuenta);
+                    $('#divTablaDetalleComprobante').empty();
+                    datosDetalleComprobante = [];
+                    datosDetalleComprobante = [['Id', 'SubCuenta', 'Debe', 'Haber', '_']];
 
+                    jQuery.each(data.DetalleComprobante.DetalleComprobante, function (indice, valor) {
+                        //valor = Object {IdSubCuenta: "111002", NombreSubCuenta: "Caja Chica 2", Debe: "50,0000", Haber: "0,0000"}
+
+                        datosDetalleComprobante.push([valor.IdSubCuenta, valor.NombreSubCuenta, valor.Debe, valor.Haber,
+                                                    '<button class="quitarFila btn btn-danger"><span class="glyphicon glyphicon-minus"></span>' +
+                                                    '<input type="hidden" value="' + datosDetalleComprobante.length + '" /></button>']);
+                    });
+
+                    var tableF = arrayToTable(datosDetalleComprobante, {
+                        thead: true,
+                        attrs: { class: 'table' }
+                    });
+
+                    $('#divTablaDetalleComprobante').append(tableF);
+
+
+
+                    //var movimientosJson = [];
+
+                    //jQuery.each(datosDetalleComprobante, function (indice, debe) {
+                    //    if (indice > 0) {
+                    //        movimientosJson[indice - 1] = { IdSubCuenta: debe[0], NombreSubCuenta: debe[1], Debe: debe[2], Haber: debe[3] };
+                    //    }
+                    //});
+
+                    $('#modalComprobante').modal();
                     desbloquear();
                     //alert(JSON.stringify(data));
                 }
             });
 
         });
+
+        function getFormattedDate(date) {
+            return date.getFullYear()
+                + "-"
+                + ("0" + (date.getMonth() + 1)).slice(-2)
+                + "-"
+                + ("0" + date.getDate()).slice(-2);
+        }
 
         $('#nuevoComprobante').click(function () {
             $('#tituloDetalleComprobante').text('Nuevo Comprobante');
@@ -156,9 +205,9 @@
 
                     idComprobanteActual = data.DetalleComprobante.Comprobante.IdComprobante;
 
-                    $('#numeroFolioComprobante').text(data.DetalleComprobante.Comprobante.NumeroFolio);
-                    $('#fechaInicialComprobante').text(data.DetalleComprobante.Comprobante.FechaInicial);
-                    $('#conceptoComprobante').text(data.DetalleComprobante.Comprobante.Concepto);
+                    $('#numeroComprobante').text(data.DetalleComprobante.Comprobante.NumeroComprobante);
+                    $('#fechaInicialComprobante').val(data.DetalleComprobante.Comprobante.FechaInicial);
+                    $('#conceptoComprobante').val(data.DetalleComprobante.Comprobante.Concepto);
 
                     jQuery.each(data.ListaSubCuentas, function (indice, cuenta) {
                         idsDeSubCuentas.data.push(cuenta.IdSubCuenta);
@@ -183,10 +232,11 @@
 
             jQuery.each(datosDetalleComprobante, function (indice, debe) {
                 if (indice > 0) {
-                    movimientosJson[indice - 1] = { IdSubCuenta: debe[0], NombreSubCuenta: debe[1] , Debe: debe[2], Haber: debe[3] };
+                    movimientosJson[indice - 1] = { IdSubCuenta: debe[0], NombreSubCuenta: debe[1], Debe: debe[2], Haber: debe[3] };
                 }
             });
-                        
+
+            $('#numeroDeComprobante').val($('#numeroComprobante').text());
             $('#idComprobante').val(idComprobanteActual);
             $('#movimientos').val(JSON.stringify(movimientosJson));
             $('#conceptoActual').val($('#conceptoComprobante').val());
@@ -257,9 +307,34 @@
 
                     $('#divTablaDetalleComprobante').empty();
 
+                    //var num = parseFloat($("#textbox").val());
+                    //var new_num = $("#textbox").val(num.toFixed(2));
+                    var debeeN;
+                    var habeerN;
+                    var debee = $('#debeComprobante').val();
+                    var habeer = $('#haberComprobante').val();
+
+                    if (debee != null && debee != "") {
+                        debee = parseFloat($('#debeComprobante').val());
+                        debeeN = debee.toFixed(2);
+                    }
+                    else {
+                        var saberD = 0;
+                        debeeN = saberD.toFixed(2);
+                    }
+
+                    if (habeer != null && habeer != "") {
+                        habeer = parseFloat($('#haberComprobante').val());
+                        habeerN = habeer.toFixed(2);
+                    }
+                    else {
+                        var saberH = 0;
+                        habeerN = saberH.toFixed(2);
+                    }
+                    
                     datosDetalleComprobante.push([$('#dropDownSubCuentas option:selected').val(),
                                                     $('#dropDownSubCuentas option:selected').text(),
-                                                    $('#debeComprobante').val(), $('#haberComprobante').val(),
+                                                    debeeN, habeerN,
                                                     '<button class="quitarFila btn btn-danger"><span class="glyphicon glyphicon-minus"></span>' +
                                                     '<input type="hidden" value="' + datosDetalleComprobante.length + '" /></button>']);
 
@@ -304,6 +379,30 @@
                 $('#dropDownSubCuentas').val($('#numeroSubcuenta').val());
                 $('#debeComprobante').focus();
             }
+        });
+
+        $('#fechaInicialComprobante').change(function () {
+
+            $.ajax({
+                type: "POST",
+                async: true,
+                cache: false,
+                url: '/Contabilidad/ActualizaNumeroComprobante',
+                context: document.body,
+                data: { fechaActual: $('input[type="date"]').val() },
+                beforeSend: function () {
+                    bloquear();
+                    //ventanaBloquear();
+                },
+                complete: function () {
+                    //$.unblockUI();
+                },
+                success: function (data) {
+                    $('#numeroComprobante').text(data.NumeroComprobante);
+                    desbloquear();
+                }
+            });
+
         });
 
         $('#example').DataTable({

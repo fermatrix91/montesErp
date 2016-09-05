@@ -26,11 +26,11 @@ namespace MontesERP.Models.DAL
         }
     
         public virtual DbSet<Producto> Productoes { get; set; }
-        public virtual DbSet<ComprobanteDeDiario> ComprobanteDeDiarios { get; set; }
         public virtual DbSet<Cuenta> Cuentas { get; set; }
         public virtual DbSet<DetalleComprobanteDeDiario> DetalleComprobanteDeDiarios { get; set; }
         public virtual DbSet<GrupoCuenta> GrupoCuentas { get; set; }
         public virtual DbSet<SubCuenta> SubCuentas { get; set; }
         public virtual DbSet<SubGrupoCuenta> SubGrupoCuentas { get; set; }
+        public virtual DbSet<ComprobanteDeDiario> ComprobanteDeDiarios { get; set; }
     }
 }

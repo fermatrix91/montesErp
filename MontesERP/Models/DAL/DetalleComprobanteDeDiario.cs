@@ -20,7 +20,7 @@ namespace MontesERP.Models.DAL
         public Nullable<decimal> Debe { get; set; }
         public Nullable<decimal> Haber { get; set; }
     
-        public virtual ComprobanteDeDiario ComprobanteDeDiario { get; set; }
         public virtual SubCuenta SubCuenta { get; set; }
+        public virtual ComprobanteDeDiario ComprobanteDeDiario { get; set; }
     }
 }

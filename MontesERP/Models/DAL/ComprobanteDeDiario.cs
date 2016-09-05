@@ -20,10 +20,10 @@ namespace MontesERP.Models.DAL
         }
     
         public int IdComprobanteDeDiario { get; set; }
+        public int NumeroComprobante { get; set; }
         public string Concepto { get; set; }
         public System.DateTime FechaInicial { get; set; }
         public Nullable<System.DateTime> FechaCierre { get; set; }
-        public int NumeroFolio { get; set; }
     
         public virtual ICollection<DetalleComprobanteDeDiario> DetalleComprobanteDeDiarios { get; set; }
     }
