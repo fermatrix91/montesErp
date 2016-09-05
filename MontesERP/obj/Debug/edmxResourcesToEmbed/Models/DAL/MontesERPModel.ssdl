@@ -5,7 +5,7 @@
       <PropertyRef Name="IdComprobanteDeDiario" />
     </Key>
     <Property Name="IdComprobanteDeDiario" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-    <Property Name="NumeroFolio" Type="int" Nullable="false" />
+    <Property Name="NumeroComprobante" Type="int" Nullable="false" />
     <Property Name="Concepto" Type="nvarchar(max)" Nullable="false" />
     <Property Name="FechaInicial" Type="datetime" Nullable="false" />
     <Property Name="FechaCierre" Type="datetime" />

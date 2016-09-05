@@ -10,17 +10,6 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-    <EntitySetMapping Name="ComprobanteDeDiarios">
-      <EntityTypeMapping TypeName="MontesERPModel.ComprobanteDeDiario">
-        <MappingFragment StoreEntitySet="ComprobanteDeDiario">
-          <ScalarProperty Name="NumeroFolio" ColumnName="NumeroFolio" />
-          <ScalarProperty Name="FechaCierre" ColumnName="FechaCierre" />
-          <ScalarProperty Name="FechaInicial" ColumnName="FechaInicial" />
-          <ScalarProperty Name="Concepto" ColumnName="Concepto" />
-          <ScalarProperty Name="IdComprobanteDeDiario" ColumnName="IdComprobanteDeDiario" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
     <EntitySetMapping Name="Cuentas">
       <EntityTypeMapping TypeName="MontesERPModel.Cuenta">
         <MappingFragment StoreEntitySet="Cuenta">
@@ -73,6 +62,17 @@
           <ScalarProperty Name="NombreSubGrupoCuenta" ColumnName="NombreSubGrupoCuenta" />
           <ScalarProperty Name="IdGrupoCuenta" ColumnName="IdGrupoCuenta" />
           <ScalarProperty Name="IdSubGrupoCuenta" ColumnName="IdSubGrupoCuenta" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ComprobanteDeDiarios">
+      <EntityTypeMapping TypeName="MontesERPModel.ComprobanteDeDiario">
+        <MappingFragment StoreEntitySet="ComprobanteDeDiario">
+          <ScalarProperty Name="FechaCierre" ColumnName="FechaCierre" />
+          <ScalarProperty Name="FechaInicial" ColumnName="FechaInicial" />
+          <ScalarProperty Name="Concepto" ColumnName="Concepto" />
+          <ScalarProperty Name="NumeroComprobante" ColumnName="NumeroComprobante" />
+          <ScalarProperty Name="IdComprobanteDeDiario" ColumnName="IdComprobanteDeDiario" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
