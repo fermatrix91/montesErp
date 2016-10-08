@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="MontesERPModelStoreContainer" CdmEntityContainer="MontesERPEntities">
+    <EntitySetMapping Name="ComprobanteDeDiario">
+      <EntityTypeMapping TypeName="MontesERPModel.ComprobanteDeDiario">
+        <MappingFragment StoreEntitySet="ComprobanteDeDiario">
+          <ScalarProperty Name="IdComprobanteDeDiario" ColumnName="IdComprobanteDeDiario" />
+          <ScalarProperty Name="NumeroComprobante" ColumnName="NumeroComprobante" />
+          <ScalarProperty Name="Concepto" ColumnName="Concepto" />
+          <ScalarProperty Name="FechaInicial" ColumnName="FechaInicial" />
+          <ScalarProperty Name="FechaCierre" ColumnName="FechaCierre" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Cuenta">
+      <EntityTypeMapping TypeName="MontesERPModel.Cuenta">
+        <MappingFragment StoreEntitySet="Cuenta">
+          <ScalarProperty Name="IdCuenta" ColumnName="IdCuenta" />
+          <ScalarProperty Name="IdSubGrupoCuenta" ColumnName="IdSubGrupoCuenta" />
+          <ScalarProperty Name="NombreCuenta" ColumnName="NombreCuenta" />
+          <ScalarProperty Name="debeAnterior" ColumnName="debeAnterior" />
+          <ScalarProperty Name="haberAnterior" ColumnName="haberAnterior" />
+          <ScalarProperty Name="debeActual" ColumnName="debeActual" />
+          <ScalarProperty Name="haberActual" ColumnName="haberActual" />
+          <ScalarProperty Name="saldo" ColumnName="saldo" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DetalleComprobanteDeDiario">
+      <EntityTypeMapping TypeName="MontesERPModel.DetalleComprobanteDeDiario">
+        <MappingFragment StoreEntitySet="DetalleComprobanteDeDiario">
+          <ScalarProperty Name="IdDetalleComprobanteDeDiario" ColumnName="IdDetalleComprobanteDeDiario" />
+          <ScalarProperty Name="IdComprobanteDeDiario" ColumnName="IdComprobanteDeDiario" />
+          <ScalarProperty Name="IdSubCuenta" ColumnName="IdSubCuenta" />
+          <ScalarProperty Name="Debe" ColumnName="Debe" />
+          <ScalarProperty Name="Haber" ColumnName="Haber" />
+          <ScalarProperty Name="Tipo" ColumnName="Tipo" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="GrupoCuenta">
+      <EntityTypeMapping TypeName="MontesERPModel.GrupoCuenta">
+        <MappingFragment StoreEntitySet="GrupoCuenta">
+          <ScalarProperty Name="IdGrupoCuenta" ColumnName="IdGrupoCuenta" />
+          <ScalarProperty Name="NombreGrupoCuenta" ColumnName="NombreGrupoCuenta" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Producto">
+      <EntityTypeMapping TypeName="MontesERPModel.Producto">
+        <MappingFragment StoreEntitySet="Producto">
+          <ScalarProperty Name="IdProducto" ColumnName="IdProducto" />
+          <ScalarProperty Name="NombreProducto" ColumnName="NombreProducto" />
+          <ScalarProperty Name="PrecioProducto" ColumnName="PrecioProducto" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SubCuenta">
+      <EntityTypeMapping TypeName="MontesERPModel.SubCuenta">
+        <MappingFragment StoreEntitySet="SubCuenta">
+          <ScalarProperty Name="IdSubCuenta" ColumnName="IdSubCuenta" />
+          <ScalarProperty Name="IdCuenta" ColumnName="IdCuenta" />
+          <ScalarProperty Name="NombreSubCuenta" ColumnName="NombreSubCuenta" />
+          <ScalarProperty Name="debeAnterior" ColumnName="debeAnterior" />
+          <ScalarProperty Name="haberAnterior" ColumnName="haberAnterior" />
+          <ScalarProperty Name="debeActual" ColumnName="debeActual" />
+          <ScalarProperty Name="haberActual" ColumnName="haberActual" />
+          <ScalarProperty Name="saldo" ColumnName="saldo" />
+          <ScalarProperty Name="tipoSaldo" ColumnName="tipoSaldo" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="SubGrupoCuenta">
+      <EntityTypeMapping TypeName="MontesERPModel.SubGrupoCuenta">
+        <MappingFragment StoreEntitySet="SubGrupoCuenta">
+          <ScalarProperty Name="IdSubGrupoCuenta" ColumnName="IdSubGrupoCuenta" />
+          <ScalarProperty Name="IdGrupoCuenta" ColumnName="IdGrupoCuenta" />
+          <ScalarProperty Name="NombreSubGrupoCuenta" ColumnName="NombreSubGrupoCuenta" />
+          <ScalarProperty Name="Saldo" ColumnName="Saldo" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>
