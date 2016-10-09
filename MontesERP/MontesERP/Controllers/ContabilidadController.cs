@@ -156,6 +156,7 @@ namespace MontesERP.Controllers
     public enum TipoSaldo
     {
         Deudor,
-        Acreedor
+        Acreedor,
+        Saldado
     }
 }

@@ -133,52 +133,7 @@ namespace MontesERP.Models.Contabilidad
 
                         idComprobante = comprobanteDiario.IdComprobanteDeDiario;
                     }
-
-
-                    //////Revertir saldo de subcuentas
-                    foreach (var detalle in listaElementoComprobanteInicial)//this.ListaInicialDetalleComprobante)
-                    {
-                        int idSubCuenta = Convert.ToInt32(detalle.IdSubCuenta);
-
-                        SubCuenta subCuenta = modeloErp.SubCuenta.Find(idSubCuenta);
-                        subCuenta.debeAnterior = subCuenta.debeActual;
-                        subCuenta.haberAnterior = subCuenta.haberActual;
-
-                        subCuenta.debeActual = (subCuenta.debeActual != null ? subCuenta.debeActual : 0) - Convert.ToDecimal(detalle.Debe);
-                        subCuenta.haberActual = (subCuenta.haberActual != null ? subCuenta.debeActual : 0) - Convert.ToDecimal(detalle.Haber);
-
-                        //Saldo
-                        switch (subCuenta.Cuenta.SubGrupoCuenta.GrupoCuenta.IdGrupoCuenta)
-                        {
-                            case 1:
-                                subCuenta.saldo = subCuenta.debeActual - subCuenta.haberActual;
-                                break;
-
-                            case 2:
-                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
-                                break;
-
-                            case 3:
-                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
-                                break;
-
-                            case 4:
-                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
-                                break;
-
-                            case 5:
-                                subCuenta.saldo = subCuenta.debeActual - subCuenta.haberActual;
-                                break;
-
-                            default:
-                                break;
-                        }
-
-                        modeloErp.SubCuenta.Attach(subCuenta);
-                        modeloErp.Entry(subCuenta).State = EntityState.Modified;
-                        modeloErp.SaveChanges();
-                    }
-
+                    
                     ///Eliminar detalle Anterior
                     ///
                     foreach (var detalle in listaElementoComprobanteInicial)
@@ -199,74 +154,12 @@ namespace MontesERP.Models.Contabilidad
                         detalleComprobante.IdSubCuenta = Convert.ToInt32(detalle.IdSubCuenta);
                         detalleComprobante.Tipo = TipoComprobante.ComprobanteDiario.ToString();
 
-                        SubCuenta subCuenta = modeloErp.SubCuenta.Find(detalleComprobante.IdSubCuenta);
-                        subCuenta.debeAnterior = subCuenta.debeActual;
-                        subCuenta.haberAnterior = subCuenta.haberActual;        //Asignar debe y haber anterior
-
-
-                        ///Acumular debe y haber
-                        subCuenta.debeActual = (subCuenta.debeActual != null ? subCuenta.debeActual : 0) + detalleComprobante.Debe;
-                        subCuenta.haberActual = (subCuenta.haberActual != null ? subCuenta.haberActual : 0) + detalleComprobante.Haber;
-
-                        //Saldo
-                        switch (subCuenta.Cuenta.SubGrupoCuenta.GrupoCuenta.IdGrupoCuenta)
-                        {
-                            case 1:
-                                subCuenta.saldo = subCuenta.debeActual - subCuenta.haberActual;
-                                break;
-
-                            case 2:
-                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
-                                break;
-
-                            case 3:
-                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
-                                break;
-
-                            case 4:
-                                subCuenta.saldo = subCuenta.haberActual - subCuenta.debeActual;
-                                break;
-
-                            case 5:
-                                subCuenta.saldo = subCuenta.debeActual - subCuenta.haberActual;
-                                break;
-
-                            default:
-                                break;
-                        }
-
                         modeloErp.DetalleComprobanteDeDiario.Add(detalleComprobante); // Agrega movimientos
-                        modeloErp.Entry(subCuenta).State = EntityState.Added;
-
-                        modeloErp.SubCuenta.Attach(subCuenta);        //Actualiza cuenta
-                        modeloErp.Entry(subCuenta).State = EntityState.Modified;
 
                         modeloErp.SaveChanges();
                     }
 
-                    ////Recarga saldo de cuentas
-
-                    foreach (var cuenta in modeloErp.Cuenta.ToList())
-                    {
-                        Cuenta cuentaActual = modeloErp.Cuenta.Find(cuenta.IdCuenta);
-
-                        cuentaActual.saldo = cuenta.SubCuenta.Sum(y => y.saldo < 0 ? y.saldo * -1 : y.saldo);
-
-                        modeloErp.Cuenta.Attach(cuentaActual);
-                        modeloErp.Entry(cuentaActual).State = EntityState.Modified;
-                        modeloErp.SaveChanges();
-                    }
-
-                    foreach (var subGrupo in modeloErp.SubGrupoCuenta.ToList())
-                    {
-                        SubGrupoCuenta subGrupoCuentaActual = modeloErp.SubGrupoCuenta.Find(subGrupo.IdSubGrupoCuenta);
-
-                        subGrupoCuentaActual.Saldo = subGrupo.Cuenta.Sum(y => y.saldo < 0 ? y.saldo * -1 : y.saldo);
-
-                        modeloErp.SubGrupoCuenta.Attach(subGrupoCuentaActual);
-                        modeloErp.Entry(subGrupoCuentaActual).State = EntityState.Modified;
-                        modeloErp.SaveChanges();
-                    }
+                    ActualizaCuentas();
 
                     return true;
 
@@ -279,6 +172,61 @@ namespace MontesERP.Models.Contabilidad
             }
 
             return false;
+        }
+
+        public void ActualizaCuentas()
+        {
+            foreach (var subCuentaTemp in modeloErp.SubCuenta.ToList())
+            {
+                List<DetalleComprobanteDeDiario> detalleTemporal = new List<DetalleComprobanteDeDiario>();
+                detalleTemporal = modeloErp.DetalleComprobanteDeDiario.Where(x => x.IdSubCuenta == subCuentaTemp.IdSubCuenta).ToList();
+
+                SubCuenta subCuenta = modeloErp.SubCuenta.Find(subCuentaTemp.IdSubCuenta);
+                subCuenta.debeAnterior = subCuenta.debeActual;
+                subCuenta.haberAnterior = subCuenta.haberActual;        //Asignar debe y haber anterior
+
+                ///Acumular debe y haber
+                subCuenta.debeActual = detalleTemporal.Sum(y => y.Debe); //(subCuenta.debeActual != null ? subCuenta.debeActual : 0) + detalleComprobante.Debe;
+                subCuenta.haberActual = detalleTemporal.Sum(y => y.Haber);//(subCuenta.haberActual != null ? subCuenta.haberActual : 0) + detalleComprobante.Haber;
+
+                //Saldo
+                decimal? saldoTemporal;
+
+                saldoTemporal = subCuenta.debeActual - subCuenta.haberActual;
+                subCuenta.tipoSaldo = (saldoTemporal > 0) ? TipoSaldo.Deudor.ToString() : TipoSaldo.Acreedor.ToString();
+                if (saldoTemporal == 0)
+                    subCuenta.tipoSaldo = TipoSaldo.Saldado.ToString();
+
+                subCuenta.saldo = subCuenta.saldo + saldoTemporal > 0 ? saldoTemporal : saldoTemporal * -1;
+
+                modeloErp.SubCuenta.Attach(subCuenta);        //Actualiza cuenta
+                modeloErp.Entry(subCuenta).State = EntityState.Modified;
+                modeloErp.SaveChanges();
+            }
+
+            ////Recarga saldo de cuentas
+
+            foreach (var cuenta in modeloErp.Cuenta.ToList())
+            {
+                Cuenta cuentaActual = modeloErp.Cuenta.Find(cuenta.IdCuenta);
+
+                cuentaActual.saldo = cuenta.SubCuenta.Sum(y => y.saldo < 0 ? y.saldo * -1 : y.saldo);
+
+                modeloErp.Cuenta.Attach(cuentaActual);
+                modeloErp.Entry(cuentaActual).State = EntityState.Modified;
+                modeloErp.SaveChanges();
+            }
+
+            foreach (var subGrupo in modeloErp.SubGrupoCuenta.ToList())
+            {
+                SubGrupoCuenta subGrupoCuentaActual = modeloErp.SubGrupoCuenta.Find(subGrupo.IdSubGrupoCuenta);
+
+                subGrupoCuentaActual.Saldo = subGrupo.Cuenta.Sum(y => y.saldo < 0 ? y.saldo * -1 : y.saldo);
+
+                modeloErp.SubGrupoCuenta.Attach(subGrupoCuentaActual);
+                modeloErp.Entry(subGrupoCuentaActual).State = EntityState.Modified;
+                modeloErp.SaveChanges();
+            }
         }
     }
 

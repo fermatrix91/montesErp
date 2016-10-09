@@ -127,6 +127,8 @@
                     $('#fechaInicialComprobante').val(getFormattedDate(fechaResultante));
                     $('#conceptoComprobante').val(data.DetalleComprobante.Comprobante.Concepto);
 
+                    document.getElementById("dropDownSubCuentas").options.length = 0;
+
                     jQuery.each(data.ListaSubCuentas, function (indice, cuenta) {
                         idsDeSubCuentas.data.push(cuenta.IdSubCuenta);
                         $('#dropDownSubCuentas').append(
@@ -184,6 +186,9 @@
             $('#numeroSubcuenta').val($('#dropDownSubCuentas option:selected').val());
 
             esNuevoRegistro = true;
+            $('#divTablaDetalleComprobante').empty();
+            datosDetalleComprobante = [];
+            datosDetalleComprobante = [['Id', 'SubCuenta', 'Debe', 'Haber', '_']];
 
             $.ajax({
                 type: "POST",
@@ -208,6 +213,8 @@
                     $('#numeroComprobante').text(data.DetalleComprobante.Comprobante.NumeroComprobante);
                     $('#fechaInicialComprobante').val(data.DetalleComprobante.Comprobante.FechaInicial);
                     $('#conceptoComprobante').val(data.DetalleComprobante.Comprobante.Concepto);
+
+                    document.getElementById("dropDownSubCuentas").options.length = 0;
 
                     jQuery.each(data.ListaSubCuentas, function (indice, cuenta) {
                         idsDeSubCuentas.data.push(cuenta.IdSubCuenta);
